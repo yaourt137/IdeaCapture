@@ -1,0 +1,17 @@
+# 使用通用的iOS .gitignore模板
+curl https://raw.githubusercontent.com/github/gitignore/main/Swift.gitignore -o .gitignore
+```
+
+或者手动创建包含常见忽略项的`.gitignore`文件，至少包括：
+```
+# Xcode
+*.xcuserdata
+*.xcworkspace/xcuserdata/
+DerivedData/
+*.xccheckout
+
+# CocoaPods
+Pods/
+
+# Swift Package Manager
+.swiftpm/
