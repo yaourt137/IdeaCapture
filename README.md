@@ -69,8 +69,8 @@ SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key-here
 
 
 ### 步骤2：配置 Supabase 数据库
-
-请用Supabase MCP...我自己手动配置失败😂
+（待补充）
+若有AI Coding软件，可用Supabase MCP直接配置好。
 
 
 ### 步骤3：运行应用
