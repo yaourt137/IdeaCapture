@@ -102,18 +102,6 @@ python3 server.py
 └─────────────────┘
 ```
 
-## 🔐 安全说明
-
-### 之前（不安全）❌
-- 用户手动输入 Service Role Key
-- 敏感密钥存储在浏览器 localStorage
-- 密钥在网络中传输
-
-### 现在（安全）✅
-- 使用 Publishable Key（客户端安全密钥）
-- 配置存储在服务器端环境变量
-- 密钥不通过浏览器传输
-- 遵守 Supabase RLS 安全策略
 
 ## 📝 文件结构
 
@@ -137,44 +125,6 @@ web/
 pip3 install fastapi uvicorn python-dotenv
 ```
 
-## ❓ 故障排查
-
-### 问题：配置加载失败
-
-**错误信息**: "Supabase 配置未设置"
-
-**解决方案**:
-1. 检查 `IdeaCapture/IdeaCapture/.env` 文件是否存在
-2. 确认文件包含 `SUPABASE_URL` 和 `SUPABASE_PUBLISHABLE_KEY`
-3. 重启服务器
-
-### 问题：端口已被占用
-
-**错误信息**: "Address already in use"
-
-**解决方案**:
-```bash
-# 查找占用端口的进程
-lsof -i :8080
-
-# 终止进程
-kill -9 <PID>
-
-# 或使用其他端口（修改 server.py 中的端口号）
-```
-
-### 问题：无法连接到 Supabase
-
-**可能原因**:
-1. Publishable Key 错误
-2. Supabase 项目已暂停
-3. RLS 策略阻止访问
-
-**解决方案**:
-1. 验证 Publishable Key 是否正确
-2. 登录 Supabase Dashboard 检查项目状态
-3. 检查 RLS 策略是否允许 SELECT 操作
-
 ## 🔄 与其他组件的关系
 
 ```
@@ -184,28 +134,3 @@ Supabase Database
     ↑ 读取想法
 Web Viewer (本项目)
 ```
-
-## 📚 相关文档
-
-- [Supabase API Keys](https://supabase.com/docs/guides/api/api-keys)
-- [FastAPI 文档](https://fastapi.tiangolo.com/)
-- [主项目重构文档](../../SUPABASE_MIGRATION.md)
-
-## 💡 未来改进
-
-- [ ] 添加想法编辑功能
-- [ ] 支持批量删除
-- [ ] 导出功能（CSV, JSON）
-- [ ] 实时同步（WebSocket）
-- [ ] 用户认证（如果需要多用户）
-- [ ] 数据可视化（图表统计）
-
-## 📄 许可证
-
-与主项目相同
-
----
-
-**更新日期**: 2026-01-31
-**版本**: 2.0.0（重构版）
-**变更**: 从手动配置改为自动从环境变量读取
