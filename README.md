@@ -153,6 +153,6 @@ IdeaCapture/
 │   └── ImagePicker.swift           # 图片选择
 ├── web/
 │   └── index.html                  # 网页端查看
-├── .env                            # 环境变量配置
-└── SUPABASE_SETUP.md              # Supabase 配置指南
+└── .env                            # 环境变量配置
+
 ```
