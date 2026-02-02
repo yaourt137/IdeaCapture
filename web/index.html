@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IdeaCapture - 网页查看</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        button {
+            padding: 12px 32px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .idea-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .idea-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .idea-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .idea-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .idea-image:hover {
+            transform: scale(1.02);
+        }
+
+        .idea-content {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            white-space: pre-wrap;
+        }
+
+        .idea-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            background: #f0f4ff;
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .idea-meta {
+            font-size: 12px;
+            color: #999;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #999;
+        }
+
+        .export-actions {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 6px 12px;
+            background: #f0f4ff;
+            color: #667eea;
+            border: 1px solid #667eea;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .export-btn:active {
+            transform: translateY(0);
+        }
+
+        .export-btn.exporting {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💡 IdeaCapture</h1>
+
+            <button id="loadBtn" onclick="loadIdeas()" disabled>🔄 加载想法</button>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 搜索想法或标签..." oninput="filterIdeas()" />
+            </div>
+
+            <div class="stats">
+                <span id="totalCount">总计: 0</span>
+                <span id="filteredCount"></span>
+                <span id="lastUpdate"></span>
+            </div>
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="success" class="success-message"></div>
+
+        <div id="loading" class="loading" style="display: none;">
+            正在加载中...
+        </div>
+
+        <div id="ideas" class="ideas-grid"></div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h3>还没有想法</h3>
+            <p>在 iOS 应用中保存想法后，它们会自动同步到这里</p>
+        </div>
+    </div>
+
+    <script>
+        let allIdeas = [];
+        let filteredIdeas = [];
+        let config = null;
+
+        // 页面加载时自动获取配置
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadConfig();
+        });
+
+        async function loadConfig() {
+            const loadBtn = document.getElementById('loadBtn');
+
+            try {
+                const response = await fetch('/api/config');
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || '配置加载失败');
+                }
+
+                config = data;
+                loadBtn.disabled = false;
+
+                // 自动加载数据
+                await loadIdeas();
+
+            } catch (err) {
+                showError(`配置加载失败: ${err.message}`);
+                loadBtn.disabled = true;
+            }
+        }
+
+        async function loadIdeas() {
+            if (!config) {
+                showError('配置未加载，请刷新页面');
+                return;
+            }
+
+            const loadBtn = document.getElementById('loadBtn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+
+            loadBtn.disabled = true;
+            loading.style.display = 'block';
+            error.style.display = 'none';
+
+            try {
+                const response = await fetch(
+                    `${config.supabase_url}/rest/v1/ideas?select=*&order=created_at.desc`,
+                    {
+                        headers: {
+                            'apikey': config.supabase_key,
+                            'Authorization': `Bearer ${config.supabase_key}`
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`请求失败: ${response.status} ${response.statusText}`);
+                }
+
+                allIdeas = await response.json();
+                filteredIdeas = allIdeas;
+                renderIdeas(filteredIdeas);
+
+                document.getElementById('totalCount').textContent = `总计: ${allIdeas.length}`;
+                document.getElementById('lastUpdate').textContent = `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                loadBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function renderIdeas(ideas) {
+            const container = document.getElementById('ideas');
+            const emptyState = document.getElementById('emptyState');
+
+            if (ideas.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.innerHTML = ideas.map((idea, index) => `
+                <div class="idea-card">
+                    <div class="idea-title">${escapeHtml(idea.title || '未命名想法')}</div>
+                    ${idea.image_url ? `
+                        <img
+                            src="${escapeHtml(idea.image_url)}"
+                            alt="想法配图"
+                            class="idea-image"
+                            onclick="window.open('${escapeHtml(idea.image_url)}', '_blank')"
+                            onerror="this.style.display='none'"
+                        />
+                    ` : ''}
+                    <div class="idea-content">${escapeHtml(idea.content)}</div>
+                    ${idea.tags && idea.tags.length > 0 ? `
+                        <div class="idea-tags">
+                            ${idea.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="idea-meta">
+                        创建时间: ${new Date(idea.created_at).toLocaleString('zh-CN')}
+                    </div>
+                    <div class="export-actions">
+                        <button class="export-btn" onclick="exportToNotion(${index})">📤 Notion</button>
+                        <button class="export-btn" onclick="exportToAnki(${index})">🗂️ Anki</button>
+                        <button class="export-btn" onclick="exportToObsidian(${index})">📝 Obsidian</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterIdeas() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+            if (!searchText) {
+                filteredIdeas = allIdeas;
+            } else {
+                filteredIdeas = allIdeas.filter(idea =>
+                    idea.title.toLowerCase().includes(searchText) ||
+                    idea.content.toLowerCase().includes(searchText) ||
+                    (idea.tags && idea.tags.some(tag => tag.toLowerCase().includes(searchText)))
+                );
+            }
+
+            renderIdeas(filteredIdeas);
+
+            const filteredCountEl = document.getElementById('filteredCount');
+            if (searchText && filteredIdeas.length !== allIdeas.length) {
+                filteredCountEl.textContent = `筛选后: ${filteredIdeas.length}`;
+            } else {
+                filteredCountEl.textContent = '';
+            }
+        }
+
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showSuccess(message) {
+            const success = document.getElementById('success');
+            success.textContent = message;
+            success.style.display = 'block';
+            setTimeout(() => {
+                success.style.display = 'none';
+            }, 5000);
+        }
+
+        // ============ 导出功能 ============
+
+        async function exportToNotion(index) {
+            const idea = filteredIdeas[index];
+            const btn = event.target;
+
+            if (btn.classList.contains('exporting')) return;
+
+            btn.classList.add('exporting');
+            btn.textContent = '导出中...';
+
+            try {
+                const response = await fetch('/api/export/notion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: idea.title || '未命名想法',
+                        content: idea.content || '',
+                        tags: idea.tags || [],
+                        created_at: idea.created_at,
+                        image_url: idea.image_url
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || '导出失败');
+                }
+
+                showSuccess(`✅ 已成功导出到 Notion！`);
+
+                // 可选：打开 Notion 页面
+                if (data.page_url) {
+                    const openUrl = confirm('导出成功！是否打开 Notion 页面查看？');
+                    if (openUrl) {
+                        window.open(data.page_url, '_blank');
+                    }
+                }
+
+            } catch (err) {
+                showError(`Notion 导出失败: ${err.message}`);
+            } finally {
+                btn.classList.remove('exporting');
+                btn.textContent = '📤 Notion';
+            }
+        }
+
+        async function exportToAnki(index) {
+            const idea = filteredIdeas[index];
+            const btn = event.target;
+
+            if (btn.classList.contains('exporting')) return;
+
+            btn.classList.add('exporting');
+            btn.textContent = '导出中...';
+
+            try {
+                const response = await fetch('/api/export/anki', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: idea.title || '未命名想法',
+                        content: idea.content || '',
+                        tags: idea.tags || [],
+                        created_at: idea.created_at
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '导出失败');
+                }
+
+                // 下载文件
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `idea-${new Date().toISOString().slice(0,10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                showSuccess('✅ Anki 文件已下载！请在 Anki 中导入该文件。');
+
+            } catch (err) {
+                showError(`Anki 导出失败: ${err.message}`);
+            } finally {
+                btn.classList.remove('exporting');
+                btn.textContent = '🗂️ Anki';
+            }
+        }
+
+        async function exportToObsidian(index) {
+            const idea = filteredIdeas[index];
+            const btn = event.target;
+
+            if (btn.classList.contains('exporting')) return;
+
+            btn.classList.add('exporting');
+            btn.textContent = '导出中...';
+
+            try {
+                const response = await fetch('/api/export/obsidian', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: idea.title || '未命名想法',
+                        content: idea.content || '',
+                        tags: idea.tags || [],
+                        created_at: idea.created_at
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '导出失败');
+                }
+
+                // 下载文件
+                const blob = await response.blob();
+                const contentDisposition = response.headers.get('Content-Disposition');
+                const filenameMatch = contentDisposition && contentDisposition.match(/filename="(.+)"/);
+                const filename = filenameMatch ? filenameMatch[1] : 'idea.md';
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                showSuccess('✅ Obsidian Markdown 文件已下载！');
+
+            } catch (err) {
+                showError(`Obsidian 导出失败: ${err.message}`);
+            } finally {
+                btn.classList.remove('exporting');
+                btn.textContent = '📝 Obsidian';
+            }
+        }
+    </script>
+</body>
+</html>

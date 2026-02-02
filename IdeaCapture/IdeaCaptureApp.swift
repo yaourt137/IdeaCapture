@@ -2,7 +2,7 @@
 //  IdeaCaptureApp.swift
 //  IdeaCapture
 //
-//  Created by Yao L on 1/31/26.
+//  想法收集应用
 //
 
 import SwiftUI
@@ -12,7 +12,7 @@ import SwiftData
 struct IdeaCaptureApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Idea.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct IdeaCaptureApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            IdeaListView()
         }
         .modelContainer(sharedModelContainer)
     }
